@@ -1,0 +1,462 @@
+{
+  "name": "Email Routing System for Evolve Retail Store",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -512,
+        16
+      ],
+      "id": "31252907-4601-44d4-a8fa-a724aba4ce81",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -144,
+        240
+      ],
+      "id": "b89f3536-c778-4e62-ae1f-786fe42f472c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hETGBU4u3PmArwk3",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an email classifier.\n\nClassify this email into exactly one department.\n\nDepartments:\n\nSales\nAdmin/Office\nLogistics\nProcurement\nHR\n\nReturn only JSON.\n\nSubject:\n{{ $node[\"Gmail Trigger\"].json[\"Subject\"] }}\n\nBody:\n{{ $node[\"Get a message\"].json[\"snippet\"] }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -144,
+        16
+      ],
+      "id": "c9f55a60-b3f2-4365-8c45-63060922c8e2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"department\": \"Admin/Office\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        224
+      ],
+      "id": "d586d4a5-727d-41a3-ad12-dfb96e0c9ff8",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.department }}",
+                    "rightValue": "Sales",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6795cc11-5e8b-4040-9250-c8d020eaaaaa"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ecfbb8a7-a2d3-4f38-b4d5-768934eefb3f",
+                    "leftValue": "={{ $json.output.department }}",
+                    "rightValue": "Logistics",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "bb9d23a0-052b-4ade-a22c-05b7e73906be",
+                    "leftValue": "={{ $json.output.department }}",
+                    "rightValue": "Billing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0fb7855d-8a04-4839-b611-24e47e36ec7e",
+                    "leftValue": "={{ $json.output.department }}",
+                    "rightValue": "Customer Support",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f02e3751-3acb-4699-a610-68a07d3fa321",
+                    "leftValue": "={{ $json.output.department }}",
+                    "rightValue": "Admin/Office",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        -32
+      ],
+      "id": "419589f2-f64c-46a1-b69a-52c54f137b7b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ \"sales@company.com\" }}",
+        "subject": "={{ $node[\"Gmail Trigger\"].json[\"Subject\"] }}",
+        "message": "=<h3>New Sales Email</h3>\n\n<b>From:</b>\n{{ $node[\"Gmail Trigger\"].json[\"From\"] }}\n\n<br><br>\n\n<b>Subject:</b>\n{{ $node[\"Gmail Trigger\"].json[\"Subject\"] }}\n\n<br><br>\n\n<b>Message:</b>\n\n{{ $node[\"Gmail Trigger\"].json[\"snippet\"] }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        368,
+        -240
+      ],
+      "id": "b58cd43b-1741-4b94-809f-12073e362e4c",
+      "name": "Send a message",
+      "webhookId": "7fbee81b-0983-45f5-8ad1-34ce61470453",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $node[\"Gmail Trigger\"].json[\"id\"] }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -368,
+        16
+      ],
+      "id": "b1868f8d-9947-4e21-82a2-65fc35dbc021",
+      "name": "Get a message",
+      "webhookId": "3c3bfb44-0b34-4cd3-8487-6842fd51bb1b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ \"logistics@company.com\" }}",
+        "subject": "={{ $node[\"Gmail Trigger\"].json[\"Subject\"] }}",
+        "message": "=<h3>New Logistics Email</h3>  <b>From:</b> {{ $node[\"Gmail Trigger\"].json[\"From\"] }}  <br><br>  <b>Subject:</b> {{ $node[\"Gmail Trigger\"].json[\"Subject\"] }}  <br><br>  <b>Message:</b>  {{ $node[\"Gmail Trigger\"].json[\"snippet\"] }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        -64
+      ],
+      "id": "564d39e4-1cfa-4000-a0f4-b0b918ac1762",
+      "name": "Send a message1",
+      "webhookId": "2708a5e4-a58c-4265-af8d-f6b4e065b5e9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ \"billing@company.com\" }}",
+        "subject": "={{ $node[\"Gmail Trigger\"].json[\"Subject\"] }}",
+        "message": "=<h3>New Billing Email</h3>  <b>From:</b> {{ $node[\"Gmail Trigger\"].json[\"From\"] }}  <br><br>  <b>Subject:</b> {{ $node[\"Gmail Trigger\"].json[\"Subject\"] }}  <br><br>  <b>Message:</b>  {{ $node[\"Gmail Trigger\"].json[\"snippet\"] }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        80
+      ],
+      "id": "5833ceac-e660-4c2c-b8e5-7779103ebdb5",
+      "name": "Send a message2",
+      "webhookId": "9078fa65-0a90-4c38-86b3-ce5efa657ea2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ \"customersupport@company.com\" }}",
+        "subject": "={{ $node[\"Gmail Trigger\"].json[\"Subject\"] }}",
+        "message": "=<h3>New CustomersupportEmail</h3>  <b>From:</b> {{ $node[\"Gmail Trigger\"].json[\"From\"] }}  <br><br>  <b>Subject:</b> {{ $node[\"Gmail Trigger\"].json[\"Subject\"] }}  <br><br>  <b>Message:</b>  {{ $node[\"Gmail Trigger\"].json[\"snippet\"] }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        512,
+        176
+      ],
+      "id": "3fc3a72a-b9b4-4f55-a362-d65ae3cc6cdb",
+      "name": "Send a message3",
+      "webhookId": "f496b37a-205f-4f12-8806-09a54e04c9f6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ \"admin@company.com\" }}",
+        "subject": "={{ $node[\"Gmail Trigger\"].json[\"Subject\"] }}",
+        "message": "=<h3>New Admin Email</h3>  <b>From:</b> {{ $node[\"Gmail Trigger\"].json[\"From\"] }}  <br><br>  <b>Subject:</b> {{ $node[\"Gmail Trigger\"].json[\"Subject\"] }}  <br><br>  <b>Message:</b>  {{ $node[\"Gmail Trigger\"].json[\"snippet\"] }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        288
+      ],
+      "id": "ea5d2026-88fb-4af2-b2ee-b553f27f2ae9",
+      "name": "Send a message4",
+      "webhookId": "0425a80a-d97e-4eb0-a981-8d54140ab4a3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a message": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "97cf8a04-d538-481a-95cb-a1368c21496e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd85f750a756199ed4b7f98542fe516b57c66a1a7890e3614dabbc2daf928396"
+  },
+  "id": "hgcX5HbxRuIoWrx3",
+  "tags": []
+}
