@@ -1,0 +1,854 @@
+{
+  "name": "Resume Screening",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Job Application Form",
+        "formDescription": "Thank you for your interest in joining our team! Please complete the form below and upload your most recent CV in PDF or DOCX format. Our recruitment team will review your application, and you will receive an email regarding the outcome.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email Address",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Phone Number"
+            },
+            {
+              "fieldLabel": "Position Applying For",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Data Analyst"
+                  },
+                  {
+                    "option": "Product Manager"
+                  },
+                  {
+                    "option": "Administration Officer"
+                  },
+                  {
+                    "option": "Product Manager"
+                  },
+                  {
+                    "option": "Business Analyst"
+                  },
+                  {
+                    "option": "Project Manager"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Years of Experience",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Skills"
+            },
+            {
+              "fieldLabel": "Upload CV",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -640,
+        0
+      ],
+      "id": "faddecab-0800-412b-937e-6095289852db",
+      "name": "On form submission",
+      "webhookId": "59f9a376-87fd-429a-a083-ef1621f8a293"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Upload_CV",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -304,
+        0
+      ],
+      "id": "972f41a5-869a-4430-9cb3-44244dac5d61",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f8310f68-3f3f-4501-9c67-c0307f16f847",
+              "name": "= Full Name",
+              "value": "={{ $json[\"Full Name\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "82e6ad15-286c-4bee-914d-3d455bcf1a1c",
+              "name": "=Email Address ",
+              "value": "={{ $json[\"Email Address\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "d5d5f7e1-9ea2-4fc3-b8ef-4e47b57cdfb3",
+              "name": "=Phone Number",
+              "value": "={{ $json[\"Phone Number\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "c9eddc5c-ae80-4e99-b252-6ee41d503f6f",
+              "name": "=Position Applying For",
+              "value": "={{ $json[\"Position Applying For\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "1c052d32-6ff9-42f0-ab1f-7a913b7a5bcb",
+              "name": "=Years of Experience",
+              "value": "={{ $json[\"Years of Experience\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "d205cb87-b49b-4082-9faa-0386c4312fa9",
+              "name": "=Key Skills",
+              "value": "={{ $json[\"Skills\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "7c92e185-f51e-414f-a65a-870601464653",
+              "name": "=Uploaded CV",
+              "value": "={{ $json[\"Upload CV\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -464,
+        0
+      ],
+      "id": "ae7f5924-41f7-4edd-9509-1c1a73e7a0f9",
+      "name": "Edit Fields (Candidate Information)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "24c13d15-efb7-45bb-a29d-8823f8ffa662",
+              "name": "=jobTitle ",
+              "value": "Data Analyst",
+              "type": "string"
+            },
+            {
+              "id": "cfe4c586-3d57-4b7d-8d20-82d901a5ce07",
+              "name": "=jobDescription",
+              "value": "SQL Python Power BI Microsoft Excel Data Visualization Communication Skills Minimum 2 years experience",
+              "type": "string"
+            },
+            {
+              "id": "76e9fb0b-4172-4005-828b-17b6c997549a",
+              "name": "=qualificationThreshold",
+              "value": "70",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -144,
+        0
+      ],
+      "id": "4fe4c661-eb56-4f79-b240-816555c253fd",
+      "name": "Edit Fields (Job Details)"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an experienced HR recruiter.\n\nYour task is to evaluate candidates objectively against the supplied job requirements.\n\nJob Title:\n{{ $json.jobTitle }}\n\nJob Description:\n{{ $json.jobDescription }}\n\nCandidate Resume:\n\n{{ $json.text }}\n\nInstructions:\n\n1. Compare the candidate's resume with the job description.\n2. Evaluate:\n   - Skills match\n   - Years of experience\n   - Relevant work history\n   - Education (if relevant)\n   - Overall suitability\n3. Give the candidate a score from 0–100.\n4. If the score is greater than or equal to {{ $json.qualificationThreshold }}, set \"qualified\" to true.\n5. Otherwise set \"qualified\" to false.\n\nReturn ONLY valid JSON.\n\n{\n  \"candidateName\": \"\",\n  \"score\": 0,\n  \"qualified\": false,\n  \"skillsMatched\": [],\n  \"missingSkills\": [],\n  \"experienceSummary\": \"\",\n  \"strengths\": [],\n  \"weaknesses\": [],\n  \"reason\": \"\"\n}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        32,
+        0
+      ],
+      "id": "c2d4e9d2-6ae9-4590-a4ac-0fe0e8a214db",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hETGBU4u3PmArwk3",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $json.content.parts[0].text;\n\nreturn [\n  {\n    json: JSON.parse(text)\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        0
+      ],
+      "id": "493333e8-3911-4796-8b3c-002756ccf0ec",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1b1781b5-6fc0-42fb-bffb-fa24118268af",
+              "leftValue": "=Value 1\n\n{{ $json.qualified }}",
+              "rightValue": "is true",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "908b3194-7c0f-4bf8-9254-c7a05e55c335",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -176,
+        256
+      ],
+      "id": "7a92d03d-69e5-4211-bd54-3b92f004a145",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -352,
+        256
+      ],
+      "id": "abc77ec1-ebb8-45a8-937a-1bc89d739633",
+      "name": "Candidate Information & Code"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g",
+          "mode": "list",
+          "cachedResultName": "Yinka AI Agency",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1169449598,
+          "mode": "list",
+          "cachedResultName": "CV Application",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g/edit#gid=1169449598"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full Name": "={{ $('Edit Fields (Candidate Information)').item.json['Full Name'] }}",
+            "Email": "={{ $('Edit Fields (Candidate Information)').item.json['Email Address'] }}",
+            "Phone Number": "={{ $('Edit Fields (Candidate Information)').item.json['Phone Number'] }}",
+            "Position Applying For": "={{ $('Edit Fields (Candidate Information)').item.json['Position Applying For'] }}",
+            "Years of Experience": "={{ $('Edit Fields (Candidate Information)').item.json['Years of Experience'] }}",
+            "Skills": "={{ $('Edit Fields (Candidate Information)').item.json.Skills }}",
+            "AI Score": "={{ $('Candidate Information & Code').item.json.score }}",
+            "Skills Matched": "={{ $('Candidate Information & Code').item.json.skillsMatched }}",
+            "Qualified": "={{ $('Candidate Information & Code').item.json.qualified }}",
+            "Missing Skills": "={{ $('Candidate Information & Code').item.json.missingSkills }}",
+            "Reason": "={{ $('Candidate Information & Code').item.json.reason }}",
+            "Date Applied": "={{ $('Candidate Information & Code').item.json.submittedAt }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Position Applying For",
+              "displayName": "Position Applying For",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Years of Experience",
+              "displayName": "Years of Experience",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Skills",
+              "displayName": "Skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AI Score",
+              "displayName": "AI Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Qualified",
+              "displayName": "Qualified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Skills Matched",
+              "displayName": "Skills Matched",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Missing Skills",
+              "displayName": "Missing Skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Applied",
+              "displayName": "Date Applied",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        480,
+        256
+      ],
+      "id": "1b80e8f9-1b48-47e6-aa62-1654b9eca3c0",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WIpoCxpv2NyFDvzf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Candidate Information & Code').item.json['Email Address'] }}",
+        "subject": "=New Qualified Candidate -{{ $('Candidate Information & Code').item.json.candidateName }}",
+        "message": "=A new candidate has passed the AI screening.\n\nName: {{ $('Candidate Information & Code').item.json.candidateName }}\n\n\nEmail:{{ $('Edit Fields (Candidate Information)').item.json['Email Address'] }}\n\n\nScore:{{ $('Candidate Information & Code').item.json.score }}\n\n\nPosition: {{ $('Candidate Information & Code').item.json['Position Applying For'] }}\n\n\nReason:  {{ $('Candidate Information & Code').item.json.reason }}",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "=data {{ $('Candidate Information & Code').item.json['Uploaded CV'] }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        208
+      ],
+      "id": "a19d3437-1250-49f3-8054-71cafa1c5ace",
+      "name": "Founder's Notification",
+      "webhookId": "69a5fe70-e21c-4b6a-bdce-f96971b3d3ee",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.candidateEmail }}",
+        "subject": "Application Received - Next Steps",
+        "emailType": "text",
+        "message": "=Hi {{ $json.candidateName }},  Thank you for applying for the {{ $json.position }} position.  We are pleased to let you know that, based on an initial review of your application, you have been shortlisted for the next stage of our recruitment process.  Our HR team will contact you shortly with the next steps.  Best regards, HR Team",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        192
+      ],
+      "id": "122933b1-73c7-43ca-98e9-7de391e575e3",
+      "name": "Qualified Applicant's Notification",
+      "webhookId": "e2ca06e6-764c-42e7-b89a-ed880eb36707",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json[\"Email Address\"] }}",
+        "subject": "Application Update",
+        "message": "=Hi {{ $json.candidateName }}, \n\n\nThank you for taking the time to apply for the {{ $json[\"Position Applying For\"] }} position. After reviewing your application, we have decided not to move forward with your application at this time. \n\n\nWe appreciate your interest and wish you success in your future career. \n\n\n\nKind regards, \n\n\n\nHR Team",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        352
+      ],
+      "id": "23366927-9263-4ec6-84ca-54ce18a6a6d0",
+      "name": "Rejected Notification",
+      "webhookId": "00df09e3-4b5d-44d2-b9e2-43fda8ef9255",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Workflow Overview\n\nAI Resume Screening Workflow\n\nThis workflow automates the initial recruitment process.\n\n• Receives job applications\n• Extracts CV text\n• Uses AI to evaluate candidates\n• Routes applicants based on qualification\n• Sends automated emails\n• Logs applications to Google Sheets",
+        "width": 448
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -368
+      ],
+      "id": "a26c063f-d092-45b6-95f3-ba828db73b43",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Candidate Information\n\nReceive applicant information from the online application form and standardize the field names for downstream processing.",
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        -176
+      ],
+      "id": "37740b9f-6405-40b6-80cd-3c8ca4bf1b8f",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Candidate Information\n\nReceive applicant information from the online application form and standardize the field names for downstream processing.",
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        -176
+      ],
+      "id": "ab9568a0-66d8-4abe-94a2-c8587977118c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Resume Processing\n\nExtract plain text from the uploaded PDF resume so it can be analyzed by AI.",
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        -176
+      ],
+      "id": "7433e6c4-573d-4e3e-a302-2a74f4da6748",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "AI Evaluation\n\nProvide the job description and resume text to Gemini AI.\n\nThe AI evaluates:\n\n• Skills\n• Experience\n• Role alignment\n\nIt returns:\n\n• Score\n• Qualification status\n• Strengths\n• Weaknesses\n• Recommendation",
+        "width": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -176
+      ],
+      "id": "843b102e-b2b5-4b62-81a7-1a90dc713ea0",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "AI Evaluation\n\nProvide the job description and resume text to Gemini AI.\n\nThe AI evaluates:\n\n• Skills\n• Experience\n• Role alignment\n\nIt returns:\n\n• Score\n• Qualification status\n• Strengths\n• Weaknesses\n• Recommendation"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        -176
+      ],
+      "id": "87f13908-26b5-4e14-b979-f2bf1260d7ee",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "AI Evaluation\n\nProvide the job description and resume text to Gemini AI.\n\nThe AI evaluates:\n\n• Skills\n• Experience\n• Role alignment\n\nIt returns:\n\n• Score\n• Qualification status\n• Strengths\n• Weaknesses\n• Recommendation",
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        64,
+        -176
+      ],
+      "id": "e09a8dfa-3fa7-45d7-9712-3df6c4e56f00",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "Merge\n\nCombine the candidate's original application details with the AI evaluation into one record.",
+        "width": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        448
+      ],
+      "id": "42ceca55-9f23-4d41-89a9-e5a6eb9ef2f4",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "Decision\n\nDetermine whether the candidate is qualified.\n\nQualified:\nNotify candidate and founder.\n\nRejected:\nSend rejection email.",
+        "width": 176
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        448
+      ],
+      "id": "a297cd1a-421d-4665-8fd1-7a6a6b35d55d",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "Founder's Notification\n\nNotify the founder when a candidate passes the AI screening.\n\nThe email includes the applicant's details and CV attachment.",
+        "width": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        384
+      ],
+      "id": "5143d557-294c-455d-a105-e0390a7a740d",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "Google Sheets\n\nStore every application in Google Sheets.\n\nThis creates a central applicant database for future review and reporting.",
+        "width": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        432
+      ],
+      "id": "9f4ce9fe-23a3-4573-9e6f-95131ea714e0",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "Project Summary\n\nProject: AI Resume Screening Workflow\n\nPurpose:\nAutomate CV screening using AI.\n\nTechnologies:\n• n8n\n• Google Forms\n• Gemini AI\n• Gmail\n• Google Sheets\n• JavaScript\n\nOutcome:\nReduces manual CV screening by automatically evaluating applicants, notifying stakeholders, and storing application data."
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        864,
+        -384
+      ],
+      "id": "f2a4d20c-29f0-400e-85b5-8235e8658322",
+      "name": "Sticky Note10"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields (Candidate Information)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields (Job Details)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields (Candidate Information)": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Candidate Information & Code",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields (Job Details)": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Candidate Information & Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Candidate Information & Code": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Founder's Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rejected Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Founder's Notification": {
+      "main": [
+        [
+          {
+            "node": "Qualified Applicant's Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qualified Applicant's Notification": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rejected Notification": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "10681bb7-df6e-4290-ae4b-6c43a0bb8d76",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd85f750a756199ed4b7f98542fe516b57c66a1a7890e3614dabbc2daf928396"
+  },
+  "id": "ANRfO2OOll09cyQB",
+  "tags": []
+}
