@@ -1,0 +1,1294 @@
+{
+  "name": "n8n Lead Capture & Qualification Workflow (AI Agency)",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Yinks AI Agency",
+        "formDescription": "Apply Here",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name"
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Phone No"
+            },
+            {
+              "fieldLabel": "Service-Type",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "AI Automation"
+                  },
+                  {
+                    "option": "AI Video Creation"
+                  },
+                  {
+                    "option": "AI Strategy Consulting"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Budget",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "0-499,999"
+                  },
+                  {
+                    "option": "500,000-999,999"
+                  },
+                  {
+                    "option": "1M and above"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Timeline",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Immediately/This Week"
+                  },
+                  {
+                    "option": "Later This Month"
+                  },
+                  {
+                    "option": "Just Researching"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -832,
+        0
+      ],
+      "id": "e0d9dc5e-f484-4f59-a8e1-73521167d8cb",
+      "name": "On form submission",
+      "webhookId": "52c2e741-f2ea-4ac7-8f1a-dc69619bdda9"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Timeline }}",
+                    "rightValue": "Immediately/This Week",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fc86af6b-ba5a-48b3-b798-df20663bd2c2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "hot"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d179fd62-c152-40f8-a17c-937f0810102f",
+                    "leftValue": "={{ $json.Timeline }}",
+                    "rightValue": "Later This Month",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Warm Leads"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "22ba246d-a856-4570-9bd2-18169cdc3e49",
+                    "leftValue": "={{ $json.Timeline }}",
+                    "rightValue": "Just Researching",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Cold Leads"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -672,
+        -16
+      ],
+      "id": "ef04026e-d890-494b-b871-620743770ee6",
+      "name": "Categorized Leads"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Budget }}",
+                    "rightValue": "1M and above",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "7dba5ecc-d9ed-45c5-b134-7e4e9af727ed"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Priority Plus"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c0be8fb3-5098-49b1-b861-a689f65d5a08",
+                    "leftValue": "={{ $json.Budget }}",
+                    "rightValue": "500,000-999,999",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Priority"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "72396e7f-c55e-48b3-bbe0-26bbfd0cbb49",
+                    "leftValue": "={{ $json.Budget }}",
+                    "rightValue": "0-499,999",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Default hot"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -480,
+        -144
+      ],
+      "id": "e389b199-b95f-4bb2-80f6-ee5436e7fbc8",
+      "name": "Budget Prioritization"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e4b6ec59-01a8-4153-96f5-6cf43e7c0090",
+              "name": "Status",
+              "value": "Priority Plus",
+              "type": "string"
+            },
+            {
+              "id": "0c134db9-2056-44ee-b04d-bae8bf601227",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        -160
+      ],
+      "id": "8478971d-a905-431c-9b99-2c3fd53a6edf",
+      "name": "Priority Plus"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g",
+          "mode": "list",
+          "cachedResultName": "Yinka AI Agency",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full Name": "={{ $json['Full Name'] }}",
+            "Email": "={{ $json.Email }}",
+            "Phone Number": "={{ $json['Phone No'] }}",
+            "Timeline": "={{ $json.Timeline }}",
+            "Budget": "={{ $json.Budget }}",
+            "Status": "={{ $json.Status }}",
+            "Service Type": "={{ $json['Service-Type'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service Type",
+              "displayName": "Service Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        -160
+      ],
+      "id": "8b86da0a-0144-4af7-9b0a-af4c1e1c3e4e",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WIpoCxpv2NyFDvzf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Welcome To Yinks. AI",
+        "emailType": "text",
+        "message": "Hi welcome,\nThank you for getting in touch with us,\nA member of our team would be in touch with you shortly",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        -160
+      ],
+      "id": "40d7ec28-e279-4eb3-9deb-f4cb1834b075",
+      "name": "Send a message",
+      "webhookId": "8c7e8019-59ab-4154-8e17-36117fde150c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "35b758db-2249-4c82-86af-7d75493cad14",
+              "name": "Status",
+              "value": "Priority",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        0
+      ],
+      "id": "1f473a21-c4df-4790-a3ca-7b6fc40f0797",
+      "name": "Priority Leads"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g",
+          "mode": "list",
+          "cachedResultName": "Yinka AI Agency",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full Name": "={{ $json['Full Name'] }}",
+            "Email": "={{ $json.Email }}",
+            "Phone Number": "={{ $json['Phone No'] }}",
+            "Timeline": "={{ $json.Timeline }}",
+            "Budget": "={{ $json.Budget }}",
+            "Status": "={{ $json.Status }}",
+            "Service Type": "={{ $json.Status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service Type",
+              "displayName": "Service Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        0
+      ],
+      "id": "5e3f979c-c994-4eed-ba19-2498dbbeb3df",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WIpoCxpv2NyFDvzf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "yshonubi@gmail.com",
+        "subject": "Welcome To Yinks.AI",
+        "emailType": "text",
+        "message": "=Hi {{$json[\"Full Name\"]}},  Thank you for contacting Yinks.AI.  We have received your inquiry regarding {{$json[\"Service Type\"]}}.  Your request has been categorized as {{$json[\"Status\"]}} and our team will review it shortly.  We will contact you soon.  Best regards, Yinks.AI",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        0
+      ],
+      "id": "502899da-0e3f-47e1-9f14-fc0de504f57b",
+      "name": "Send a message1",
+      "webhookId": "dc53bce1-0edf-495b-9ae8-9fe2d134d19a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f02d5721-dede-4875-a434-8af99e2eb1e1",
+              "name": "Status",
+              "value": "Default",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        144
+      ],
+      "id": "6583fe2e-69eb-414e-b06c-a06bff76e0a2",
+      "name": "Default"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g",
+          "mode": "list",
+          "cachedResultName": "Yinka AI Agency",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full Name": "={{ $json['Full Name'] }}",
+            "Email": "={{ $json.Email }}",
+            "Phone Number": "={{ $json['Phone No'] }}",
+            "Timeline": "={{ $json.Timeline }}",
+            "Budget": "={{ $json.Budget }}",
+            "Status": "={{ $json.Status }}",
+            "Service Type": "={{ $json['Service-Type'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service Type",
+              "displayName": "Service Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        144
+      ],
+      "id": "581b100e-cd96-4048-8424-b92da85361a3",
+      "name": "Append row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WIpoCxpv2NyFDvzf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "yinkashonubi@yahoo.com",
+        "subject": "Welcome to Yinks AI",
+        "emailType": "text",
+        "message": "=Hi {{$json[\"Full Name\"]}},  Thank you for contacting Yinks.AI.  We have received your inquiry regarding {{$json[\"Service Type\"]}}.  Your request has been categorized as {{$json[\"Status\"]}} and our team will review it shortly.  We will contact you soon.  Best regards, Yinks.AI",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        144
+      ],
+      "id": "b5e89384-1990-4845-b81d-f4dc7b712eee",
+      "name": "Send a message2",
+      "webhookId": "57a65cce-e23d-4368-add7-456fa2c3d986",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g",
+          "mode": "list",
+          "cachedResultName": "Yinka AI Agency",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full Name": "={{ $json['Full Name'] }}",
+            "Email": "={{ $json.Email }}",
+            "Phone Number": "={{ $json['Phone No'] }}",
+            "Timeline": "={{ $json.Timeline }}",
+            "Budget": "={{ $json.Budget }}",
+            "Status": "={{ $json.Status }}",
+            "Service Type": "={{ $json['Service-Type'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service Type",
+              "displayName": "Service Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        320
+      ],
+      "id": "c191915d-8d5c-4c75-8c3b-9dff9bac9bf9",
+      "name": "Append row in sheet3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WIpoCxpv2NyFDvzf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "yinkashonubi@yahoo.com",
+        "subject": "Welcome To Yinks AI",
+        "emailType": "text",
+        "message": "Hi Ade Yinka, \n\nThank you for contacting Yinks.AI.  \nWe have received your inquiry regarding AI Automation.  \nYour request has been categorized as Default and our team will review it shortly.  \nWe will contact you soon.  \n\nBest regards, \nYinks.AI",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        320
+      ],
+      "id": "afb1d984-9aff-4734-86ed-c5f8cc0049c7",
+      "name": "Send a message3",
+      "webhookId": "698597be-0b59-4224-ab01-8fa0210a9df3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g",
+          "mode": "list",
+          "cachedResultName": "Yinka AI Agency",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-OouYgDcNBeuZ6t5Q-XVY6O4ztLYZW_Bh7zGN0q9X0g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full Name": "={{ $('On form submission').item.json['Full Name'] }}",
+            "Email": "={{ $('On form submission').item.json.Email }}",
+            "Phone Number": "={{ $('On form submission').item.json['Phone No'] }}",
+            "Timeline": "={{ $('On form submission').item.json.Timeline }}",
+            "Budget": "={{ $('On form submission').item.json.Budget }}",
+            "Service Type": "={{ $('On form submission').item.json['Service-Type'] }}",
+            "Status": "={{ $json.Status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timeline",
+              "displayName": "Timeline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service Type",
+              "displayName": "Service Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        512
+      ],
+      "id": "16eaca89-a361-4315-987b-0a7220680219",
+      "name": "Append row in sheet4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WIpoCxpv2NyFDvzf",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": " yinkashonubi@yahoo.com",
+        "subject": "Welcome To Yinks AI",
+        "emailType": "text",
+        "message": "Hi Ade Yinka,  \n\nThank you for contacting Yinks.AI.  \nWe have received your inquiry regarding AI Automation.  \nYour request has been categorized as Default and our team will review it shortly.  \nWe will contact you soon.  \n\nBest regards, \n\nYinks.AI",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        512
+      ],
+      "id": "d55c8787-9985-4835-bcff-6203e15757b8",
+      "name": "Send a message4",
+      "webhookId": "cc980172-7a70-464d-9776-d7b8d615a9b8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Vo130kHVqvdzsOtC",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "05d5cee1-8a56-425d-baab-104f824e62c9",
+              "name": "Status",
+              "value": "Warm Lead ",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        320
+      ],
+      "id": "438bb9be-3ce3-45a8-8400-d823d0535af7",
+      "name": "Warm Leads"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6fe974b8-1e1d-4afb-97ed-e64c21daccc1",
+              "name": "Status",
+              "value": "Cold Leads",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        512
+      ],
+      "id": "f7117459-bd70-4efe-910d-5d794f502291",
+      "name": "Cold Leads"
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Full Name": "Ade Yinka",
+          "Email": "yinkashonubi@yahoo.com",
+          "Phone No": "08028470628",
+          "Service-Type": "AI Automation",
+          "Budget": "500,000-999,999",
+          "Timeline": "Just Researching",
+          "submittedAt": "2026-06-22T18:59:23.178-04:00",
+          "formMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Categorized Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorized Leads": {
+      "main": [
+        [
+          {
+            "node": "Budget Prioritization",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Warm Leads",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cold Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Budget Prioritization": {
+      "main": [
+        [
+          {
+            "node": "Priority Plus",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Priority Leads",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Default",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Priority Plus": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Priority Leads": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet3": {
+      "main": [
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet4": {
+      "main": [
+        [
+          {
+            "node": "Send a message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Warm Leads": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cold Leads": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "69617c15-3326-44bb-aad0-9357cd05be20",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd85f750a756199ed4b7f98542fe516b57c66a1a7890e3614dabbc2daf928396"
+  },
+  "id": "DB4RVxFoRP1WYOHK",
+  "tags": []
+}
