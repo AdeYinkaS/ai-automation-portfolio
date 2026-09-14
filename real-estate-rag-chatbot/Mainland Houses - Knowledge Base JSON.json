@@ -1,0 +1,158 @@
+{
+  "name": "Mainland Houses - Knowledge Base",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        -48
+      ],
+      "id": "6e1d0c99-d50a-42c4-b819-c52fd3fd131c",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1d0lnWgDu4zvnfMgDEhOn-7dhwU7yB7Pd",
+          "mode": "list",
+          "cachedResultName": "Buying Process.docx",
+          "cachedResultUrl": "https://docs.google.com/document/d/1d0lnWgDu4zvnfMgDEhOn-7dhwU7yB7Pd/edit?usp=drivesdk&ouid=103102749893569334192&rtpof=true&sd=true"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -560,
+        -48
+      ],
+      "id": "8a3081f5-5ff5-4e08-acc1-73fa3b8056a7",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "VsZNIc9AdKZ5NJ5Z",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "mainland_houses",
+          "mode": "list",
+          "cachedResultName": "mainland_houses"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        -352,
+        -48
+      ],
+      "id": "876dc28e-d096-428d-b2cd-02fbef834f88",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "o9WohptZjhuUcSSE",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        176
+      ],
+      "id": "8266c764-96a9-4d4c-b163-497657ca21a5",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hETGBU4u3PmArwk3",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -192,
+        176
+      ],
+      "id": "4e67fd14-5c0a-443b-b808-909451e7477b",
+      "name": "Default Data Loader1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "83912c7f-13ef-41db-8843-13018f51247c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd85f750a756199ed4b7f98542fe516b57c66a1a7890e3614dabbc2daf928396"
+  },
+  "id": "3Asx7CWE39erKsjm",
+  "tags": []
+}
